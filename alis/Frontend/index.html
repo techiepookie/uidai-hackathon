@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ALIS - Aadhaar Lifecycle Intelligence System. Predictive analytics for UIDAI operations.">
+    <title>ALIS - Aadhaar Lifecycle Intelligence System</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Leaflet for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-fingerprint"></i>
+                <span>ALIS</span>
+            </div>
+            <span class="version">v4.0</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-page="map">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Map View</span>
+            </a>
+            <a href="#" class="nav-item" data-page="priority">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Priority Actions</span>
+            </a>
+            <a href="#" class="nav-item" data-page="analytics">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#" class="nav-item" data-page="anomalies">
+                <i class="fas fa-bell"></i>
+                <span>Anomalies</span>
+                <span class="badge" id="anomaly-badge">0</span>
+            </a>
+            <a href="#" class="nav-item" data-page="predictions">
+                <i class="fas fa-crystal-ball"></i>
+                <span>Predictions</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="data-freshness">
+                <i class="fas fa-clock"></i>
+                <span>Data: <span id="data-freshness">Loading...</span></span>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="pincode-search" placeholder="Search pincode...">
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" id="refresh-btn" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="btn-icon" id="theme-toggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Alert Banner -->
+        <div class="alert-banner" id="alert-banner" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="alert-message"></span>
+            <button class="alert-close" id="alert-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Dashboard Page -->
+        <div class="page" id="page-dashboard">
+            <!-- Stats Cards -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon critical">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Critical Pincodes</span>
+                        <span class="stat-value" id="stat-critical">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon high">
+                        <i class="fas fa-arrow-trend-up"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">High Risk</span>
+                        <span class="stat-value" id="stat-high">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">New Anomalies</span>
+                        <span class="stat-value" id="stat-anomalies">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Model Accuracy</span>
+                        <span class="stat-value" id="stat-accuracy">0%</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Charts Row -->
+            <section class="charts-row">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3>Risk Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="risk-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3>Update Trends (30 Days)</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Priority Actions Table -->
+            <section class="priority-section">
+                <div class="section-header">
+                    <h2>Top Priority Actions</h2>
+                    <a href="#" class="view-all" data-page="priority">View All →</a>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="priority-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Pincode</th>
+                                <th>State</th>
+                                <th>Risk Score</th>
+                                <th>Category</th>
+                                <th>Bio Updates</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priority-tbody">
+                            <tr>
+                                <td colspan="7" class="loading-cell">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Map Page -->
+        <div class="page" id="page-map" style="display: none;">
+            <div class="map-container">
+                <div id="india-map"></div>
+                <div class="map-legend">
+                    <h4>Risk Level</h4>
+                    <div class="legend-item">
+                        <span class="legend-color critical"></span>
+                        <span>Critical (80+)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color high"></span>
+                        <span>High (60-79)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color medium"></span>
+                        <span>Medium (40-59)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color low"></span>
+                        <span>Low (&lt;40)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Priority Actions Page -->
+        <div class="page" id="page-priority" style="display: none;">
+            <div class="page-header">
+                <h2>Priority Actions</h2>
+                <div class="page-filters">
+                    <select id="state-filter" class="filter-select">
+                        <option value="">All States</option>
+                    </select>
+                    <select id="risk-filter" class="filter-select">
+                        <option value="">All Risk Levels</option>
+                        <option value="CRITICAL">Critical</option>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="full-priority-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Pincode</th>
+                            <th>State</th>
+                            <th>District</th>
+                            <th>Risk Score</th>
+                            <th>Category</th>
+                            <th>Bio Risk</th>
+                            <th>Demo Risk</th>
+                            <th>Migration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="full-priority-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Analytics Page -->
+        <div class="page" id="page-analytics" style="display: none;">
+            <div class="analytics-grid">
+                <div class="chart-card large">
+                    <div class="card-header">
+                        <h3>State-wise Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="state-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3>Cluster Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="cluster-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h3>Update Types</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="update-type-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Anomalies Page -->
+        <div class="page" id="page-anomalies" style="display: none;">
+            <div class="page-header">
+                <h2>Detected Anomalies</h2>
+                <div class="page-filters">
+                    <select id="severity-filter" class="filter-select">
+                        <option value="">All Severities</option>
+                        <option value="CRITICAL">Critical</option>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                    </select>
+                    <select id="metric-filter" class="filter-select">
+                        <option value="">All Metrics</option>
+                        <option value="bio">Biometric</option>
+                        <option value="demo">Demographic</option>
+                        <option value="mobile">Mobile</option>
+                    </select>
+                </div>
+            </div>
+            <div class="anomaly-cards" id="anomaly-cards">
+                <!-- Anomaly cards will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Predictions Page -->
+        <div class="page" id="page-predictions" style="display: none;">
+            <div class="prediction-search">
+                <input type="text" id="forecast-pincode" placeholder="Enter pincode for forecast">
+                <button class="btn-primary" id="forecast-btn">
+                    <i class="fas fa-chart-line"></i> Generate Forecast
+                </button>
+            </div>
+            <div class="chart-card large" id="forecast-container" style="display: none;">
+                <div class="card-header">
+                    <h3>30-Day Forecast: <span id="forecast-pincode-label"></span></h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="forecast-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pincode Detail Modal -->
+        <div class="modal" id="pincode-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-pincode-title">Pincode Details</h2>
+                    <button class="modal-close" id="modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/tables.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
