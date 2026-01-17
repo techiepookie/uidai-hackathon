@@ -96,20 +96,25 @@ class AnomalyDetectorService:
         
         contamination = contamination or self.isolation_contamination
         
-        # Reshape for sklearn
-        X = values.reshape(-1, 1)
-        
-        # Fit Isolation Forest
-        clf = IsolationForest(
-            contamination=contamination,
-            random_state=42,
-            n_estimators=100
-        )
-        
-        predictions = clf.fit_predict(X)
-        
-        # -1 indicates anomaly
-        return predictions == -1
+        try:
+            # Reshape for sklearn
+            X = values.reshape(-1, 1)
+            
+            # Fit Isolation Forest
+            clf = IsolationForest(
+                contamination=contamination,
+                random_state=42,
+                n_estimators=100,
+                n_jobs=1  # Single thread to avoid parallel issues
+            )
+            
+            predictions = clf.fit_predict(X)
+            
+            # -1 indicates anomaly
+            return predictions == -1
+        except Exception as e:
+            logger.warning(f"Isolation Forest failed: {e}")
+            return np.zeros(len(values), dtype=bool)
     
     def detect_rolling_anomalies(
         self,

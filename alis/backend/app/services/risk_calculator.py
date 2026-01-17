@@ -293,10 +293,11 @@ class RiskCalculatorService:
         cutoff_date = date.today() - timedelta(days=days_lookback)
         
         # Get all unique pincodes with aggregated data
+        # Group only by pincode to avoid duplicates (same pincode in different state/district records)
         pincode_data = self.db.query(
             RawUpdate.pincode,
-            RawUpdate.state,
-            RawUpdate.district,
+            func.max(RawUpdate.state).label('state'),
+            func.max(RawUpdate.district).label('district'),
             func.sum(RawUpdate.bio_5_17).label('bio_5_17'),
             func.sum(RawUpdate.bio_total).label('bio_total'),
             func.sum(RawUpdate.demo_total).label('demo_total'),
@@ -308,9 +309,7 @@ class RiskCalculatorService:
         ).filter(
             RawUpdate.date >= cutoff_date
         ).group_by(
-            RawUpdate.pincode,
-            RawUpdate.state,
-            RawUpdate.district
+            RawUpdate.pincode
         ).all()
         
         processed = 0
@@ -319,6 +318,9 @@ class RiskCalculatorService:
             try:
                 self._calculate_pincode_metrics(row, days_lookback)
                 processed += 1
+                if processed % 1000 == 0:
+                    self.db.commit()  # Commit periodically
+                    logger.info(f"Processed {processed} pincodes...")
             except Exception as e:
                 logger.error(f"Error processing pincode {row.pincode}: {e}")
         

@@ -1,373 +1,398 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ALIS - Aadhaar Lifecycle Intelligence System. Predictive analytics for UIDAI operations.">
-    <title>ALIS - Aadhaar Lifecycle Intelligence System</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Leaflet for Maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="css/style.css">
+    <title>ALIS | Aadhaar Lifecycle Intelligence System</title>
+
+    <!-- Fonts: Inter (Strict, Clean, Government Standard) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // We are defining a strict monochrome palette
+                        // No blues, no purples. Just Black, White, and Gray.
+                        mono: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                            950: '#030712', // Almost pure black
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Precision Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 0px;
+        }
+
+        /* Smooth section focusing */
+        section {
+            scroll-margin-top: 100px;
+        }
+
+        /* Video Container Aspect Ratio */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            /* 16:9 */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
-<body>
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-fingerprint"></i>
-                <span>ALIS</span>
-            </div>
-            <span class="version">v4.0</span>
-        </div>
-        
-        <nav class="sidebar-nav">
-            <a href="#" class="nav-item active" data-page="dashboard">
-                <i class="fas fa-chart-line"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-item" data-page="map">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>Map View</span>
-            </a>
-            <a href="#" class="nav-item" data-page="priority">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Priority Actions</span>
-            </a>
-            <a href="#" class="nav-item" data-page="analytics">
-                <i class="fas fa-chart-bar"></i>
-                <span>Analytics</span>
-            </a>
-            <a href="#" class="nav-item" data-page="anomalies">
-                <i class="fas fa-bell"></i>
-                <span>Anomalies</span>
-                <span class="badge" id="anomaly-badge">0</span>
-            </a>
-            <a href="#" class="nav-item" data-page="predictions">
-                <i class="fas fa-crystal-ball"></i>
-                <span>Predictions</span>
-            </a>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <div class="data-freshness">
-                <i class="fas fa-clock"></i>
-                <span>Data: <span id="data-freshness">Loading...</span></span>
-            </div>
-        </div>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <button class="menu-toggle" id="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="page-title" id="page-title">Dashboard</h1>
-            </div>
-            
-            <div class="header-right">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="pincode-search" placeholder="Search pincode...">
+
+<body
+    class="font-sans antialiased text-neutral-900 bg-white dark:bg-black dark:text-neutral-100 transition-colors duration-200"
+    x-data="{ 
+          darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+          activeSection: 'home',
+          toggleTheme() {
+              this.darkMode = !this.darkMode;
+              localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
+              if (this.darkMode) {
+                  document.documentElement.classList.add('dark');
+              } else {
+                  document.documentElement.classList.remove('dark');
+              }
+          },
+          init() {
+              if(this.darkMode) document.documentElement.classList.add('dark');
+              
+              // Scroll Spy Logic
+              const observer = new IntersectionObserver((entries) => {
+                  entries.forEach(entry => {
+                      if (entry.isIntersecting) {
+                          this.activeSection = entry.target.id;
+                      }
+                  });
+              }, { threshold: 0.5 });
+
+              document.querySelectorAll('section').forEach(section => {
+                  observer.observe(section);
+              });
+          }
+      }">
+
+    <!-- Navigation -->
+    <nav
+        class="fixed w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex items-center justify-center w-8 h-8 rounded bg-black dark:bg-white text-white dark:text-black">
+                        <i class="ph-bold ph-shield-check text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">ALIS</span>
                 </div>
-                <div class="header-actions">
-                    <button class="btn-icon" id="refresh-btn" title="Refresh Data">
-                        <i class="fas fa-sync-alt"></i>
+
+                <!-- Desktop Menu with Scroll Highlighting -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#home"
+                        :class="activeSection === 'home' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
+                        class="text-sm transition-colors duration-200">
+                        Overview
+                    </a>
+                    <a href="#demo"
+                        :class="activeSection === 'demo' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
+                        class="text-sm transition-colors duration-200">
+                        Live Demo
+                    </a>
+                    <a href="#stats"
+                        :class="activeSection === 'stats' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
+                        class="text-sm transition-colors duration-200">
+                        Impact
+                    </a>
+                    <a href="#features"
+                        :class="activeSection === 'features' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
+                        class="text-sm transition-colors duration-200">
+                        System
+                    </a>
+
+                    <div class="h-6 w-px bg-neutral-200 dark:bg-neutral-800 mx-2"></div>
+
+                    <!-- Theme Toggle -->
+                    <button @click="toggleTheme()"
+                        class="text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                        <i class="ph-fill ph-sun text-lg" x-show="!darkMode"></i>
+                        <i class="ph-fill ph-moon text-lg" x-show="darkMode" style="display: none;"></i>
                     </button>
-                    <button class="btn-icon" id="theme-toggle" title="Toggle Theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Alert Banner -->
-        <div class="alert-banner" id="alert-banner" style="display: none;">
-            <i class="fas fa-exclamation-circle"></i>
-            <span id="alert-message"></span>
-            <button class="alert-close" id="alert-close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        
-        <!-- Dashboard Page -->
-        <div class="page" id="page-dashboard">
-            <!-- Stats Cards -->
-            <section class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon critical">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">Critical Pincodes</span>
-                        <span class="stat-value" id="stat-critical">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon high">
-                        <i class="fas fa-arrow-trend-up"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">High Risk</span>
-                        <span class="stat-value" id="stat-high">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon warning">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">New Anomalies</span>
-                        <span class="stat-value" id="stat-anomalies">0</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon success">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-label">Model Accuracy</span>
-                        <span class="stat-value" id="stat-accuracy">0%</span>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Charts Row -->
-            <section class="charts-row">
-                <div class="chart-card">
-                    <div class="card-header">
-                        <h3>Risk Distribution</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="risk-chart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-card">
-                    <div class="card-header">
-                        <h3>Update Trends (30 Days)</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="trend-chart"></canvas>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Priority Actions Table -->
-            <section class="priority-section">
-                <div class="section-header">
-                    <h2>Top Priority Actions</h2>
-                    <a href="#" class="view-all" data-page="priority">View All →</a>
-                </div>
-                <div class="table-container">
-                    <table class="data-table" id="priority-table">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Pincode</th>
-                                <th>State</th>
-                                <th>Risk Score</th>
-                                <th>Category</th>
-                                <th>Bio Updates</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="priority-tbody">
-                            <tr>
-                                <td colspan="7" class="loading-cell">
-                                    <i class="fas fa-spinner fa-spin"></i> Loading...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-        
-        <!-- Map Page -->
-        <div class="page" id="page-map" style="display: none;">
-            <div class="map-container">
-                <div id="india-map"></div>
-                <div class="map-legend">
-                    <h4>Risk Level</h4>
-                    <div class="legend-item">
-                        <span class="legend-color critical"></span>
-                        <span>Critical (80+)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color high"></span>
-                        <span>High (60-79)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color medium"></span>
-                        <span>Medium (40-59)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color low"></span>
-                        <span>Low (&lt;40)</span>
-                    </div>
+
+                    <!-- CTA -->
+                    <a href="http://localhost:8501" target="_blank"
+                        class="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-semibold rounded hover:opacity-80 transition-opacity">
+                        Dashboard
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <!-- Priority Actions Page -->
-        <div class="page" id="page-priority" style="display: none;">
-            <div class="page-header">
-                <h2>Priority Actions</h2>
-                <div class="page-filters">
-                    <select id="state-filter" class="filter-select">
-                        <option value="">All States</option>
-                    </select>
-                    <select id="risk-filter" class="filter-select">
-                        <option value="">All Risk Levels</option>
-                        <option value="CRITICAL">Critical</option>
-                        <option value="HIGH">High</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="LOW">Low</option>
-                    </select>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-4xl mx-auto mb-16" data-aos="fade-up">
+                <div
+                    class="inline-block border border-neutral-200 dark:border-neutral-800 rounded-full px-4 py-1.5 mb-8">
+                    <span
+                        class="text-xs font-mono font-medium text-neutral-600 dark:text-neutral-400 uppercase tracking-widest">
+                        UIDAI Hackathon 2026
+                    </span>
                 </div>
-            </div>
-            <div class="table-container">
-                <table class="data-table" id="full-priority-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Pincode</th>
-                            <th>State</th>
-                            <th>District</th>
-                            <th>Risk Score</th>
-                            <th>Category</th>
-                            <th>Bio Risk</th>
-                            <th>Demo Risk</th>
-                            <th>Migration</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="full-priority-tbody">
-                    </tbody>
-                </table>
+
+                <h1 class="text-6xl md:text-8xl font-bold tracking-tighter text-black dark:text-white mb-8">
+                    Lifecycle<br>
+                    <span class="text-neutral-500 dark:text-neutral-600">Intelligence.</span>
+                </h1>
+
+                <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+                    A strictly governed AI system for anomaly detection, kit resource forecasting, and fraud prevention
+                    across the Aadhaar ecosystem.
+                </p>
+
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="http://localhost:8501" target="_blank"
+                        class="px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-semibold rounded text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-chart-bar"></i>
+                        Launch Dashboard
+                    </a>
+                    <a href="http://localhost:8000/api/docs" target="_blank"
+                        class="px-8 py-4 bg-transparent border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-semibold rounded text-lg hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-code"></i>
+                        Documentation
+                    </a>
+                </div>
             </div>
         </div>
-        
-        <!-- Analytics Page -->
-        <div class="page" id="page-analytics" style="display: none;">
-            <div class="analytics-grid">
-                <div class="chart-card large">
-                    <div class="card-header">
-                        <h3>State-wise Overview</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="state-chart"></canvas>
+    </section>
+
+    <!-- Video Section -->
+    <section id="demo" class="py-12 bg-white dark:bg-black">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-black dark:text-white">System Demonstration</h2>
+                <p class="text-neutral-500 mt-2">See how ALIS detects anomalies in real-time.</p>
+            </div>
+
+            <!-- Video Container -->
+            <div class="relative rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-2xl bg-neutral-100 dark:bg-neutral-900"
+                data-aos="zoom-in">
+                <!-- Replace 'YOUR_VIDEO_ID' with actual ID. 
+                     Using a placeholder div for now, but configured for YouTube -->
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=1" title="ALIS Demo Video"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section (High Contrast Grid) -->
+    <section id="stats"
+        class="py-24 border-y border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-px bg-neutral-200 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800">
+                <div class="bg-white dark:bg-black p-10 text-center">
+                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">19k</div>
+                    <div class="text-sm font-mono text-neutral-500 uppercase">Pincodes</div>
+                </div>
+                <div class="bg-white dark:bg-black p-10 text-center">
+                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">3.7M</div>
+                    <div class="text-sm font-mono text-neutral-500 uppercase">Records</div>
+                </div>
+                <div class="bg-white dark:bg-black p-10 text-center">
+                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">87%</div>
+                    <div class="text-sm font-mono text-neutral-500 uppercase">Accuracy</div>
+                </div>
+                <div class="bg-white dark:bg-black p-10 text-center">
+                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">7</div>
+                    <div class="text-sm font-mono text-neutral-500 uppercase">Risk Clusters</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section (The Pipeline) -->
+    <section id="features" class="py-24 bg-white dark:bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Col 1 -->
+                <div class="space-y-12">
+                    <div class="border-l-2 border-black dark:border-white pl-6" data-aos="fade-up">
+                        <i class="ph-bold ph-shield-warning text-3xl mb-4 block"></i>
+                        <h3 class="text-xl font-bold text-black dark:text-white mb-2">Fraud Detection</h3>
+                        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                            Isolation Forest algorithms identify operators gaming the system through intentional
+                            biometric failures.
+                        </p>
                     </div>
                 </div>
-                
-                <div class="chart-card">
-                    <div class="card-header">
-                        <h3>Cluster Distribution</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="cluster-chart"></canvas>
+
+                <!-- Col 2 -->
+                <div class="space-y-12">
+                    <div class="border-l-2 border-black dark:border-white pl-6" data-aos="fade-up" data-aos-delay="100">
+                        <i class="ph-bold ph-trend-up text-3xl mb-4 block"></i>
+                        <h3 class="text-xl font-bold text-black dark:text-white mb-2">SARIMA Forecasting</h3>
+                        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                            Predictive modeling for enrollment center footfall, allowing proactive kit reallocation 30
+                            days in advance.
+                        </p>
                     </div>
                 </div>
-                
-                <div class="chart-card">
-                    <div class="card-header">
-                        <h3>Update Types</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="update-type-chart"></canvas>
+
+                <!-- Col 3 -->
+                <div class="space-y-12">
+                    <div class="border-l-2 border-black dark:border-white pl-6" data-aos="fade-up" data-aos-delay="200">
+                        <i class="ph-bold ph-map-pin text-3xl mb-4 block"></i>
+                        <h3 class="text-xl font-bold text-black dark:text-white mb-2">Geo-Clustering</h3>
+                        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                            K-Means clustering automatically segments districts into high-efficiency or dark zones for
+                            nodal officer review.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Anomalies Page -->
-        <div class="page" id="page-anomalies" style="display: none;">
-            <div class="page-header">
-                <h2>Detected Anomalies</h2>
-                <div class="page-filters">
-                    <select id="severity-filter" class="filter-select">
-                        <option value="">All Severities</option>
-                        <option value="CRITICAL">Critical</option>
-                        <option value="HIGH">High</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="LOW">Low</option>
-                    </select>
-                    <select id="metric-filter" class="filter-select">
-                        <option value="">All Metrics</option>
-                        <option value="bio">Biometric</option>
-                        <option value="demo">Demographic</option>
-                        <option value="mobile">Mobile</option>
-                    </select>
-                </div>
-            </div>
-            <div class="anomaly-cards" id="anomaly-cards">
-                <!-- Anomaly cards will be populated here -->
+    </section>
+
+    <!-- Tech Stack (Minimalist) -->
+    <section class="py-20 border-t border-neutral-200 dark:border-neutral-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm font-mono text-neutral-500 mb-8 uppercase tracking-widest">Built With</p>
+            <div
+                class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Using Text for cleanest look, or Phosphor icons -->
+                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
+                        class="ph-bold ph-python-logo"></i> Python</div>
+                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
+                        class="ph-bold ph-lightning"></i> FastAPI</div>
+                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
+                        class="ph-bold ph-browsers"></i> Streamlit</div>
+                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i class="ph-bold ph-brain"></i>
+                    XGBoost</div>
+                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
+                        class="ph-bold ph-database"></i> SQLite</div>
             </div>
         </div>
-        
-        <!-- Predictions Page -->
-        <div class="page" id="page-predictions" style="display: none;">
-            <div class="prediction-search">
-                <input type="text" id="forecast-pincode" placeholder="Enter pincode for forecast">
-                <button class="btn-primary" id="forecast-btn">
-                    <i class="fas fa-chart-line"></i> Generate Forecast
-                </button>
+    </section>
+
+    <!-- Footer (Solid High Contrast) -->
+    <footer class="bg-black text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">ALIS</h3>
+                    <p class="text-neutral-400 text-sm leading-relaxed">
+                        Aadhaar Lifecycle Intelligence System.<br>
+                        Ensuring integrity through data.<br>
+                        Built for UIDAI Hackathon 2026.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Dashboard</h4>
+                    <ul class="space-y-2 text-sm text-neutral-400">
+                        <li><a href="http://localhost:8501" class="hover:text-white transition-colors">Launch
+                                Analytics</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Risk Reports</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Resource Maps</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Developers</h4>
+                    <ul class="space-y-2 text-sm text-neutral-400">
+                        <li><a href="http://localhost:8000/api/docs" class="hover:text-white transition-colors">API
+                                Reference</a></li>
+                        <li><a href="http://localhost:8000/redoc" class="hover:text-white transition-colors">Redoc</a>
+                        </li>
+                        <li><a href="http://localhost:8000/health" class="hover:text-white transition-colors">System
+                                Status</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-neutral-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Use</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Data Governance</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="chart-card large" id="forecast-container" style="display: none;">
-                <div class="card-header">
-                    <h3>30-Day Forecast: <span id="forecast-pincode-label"></span></h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="forecast-chart"></canvas>
-                </div>
+
+            <div
+                class="border-t border-neutral-800 mt-16 pt-8 flex justify-between items-center text-xs text-neutral-500">
+                <p>&copy; 2026 ALIS Team. All rights reserved.</p>
+                <p>Government of India</p>
             </div>
         </div>
-        
-        <!-- Pincode Detail Modal -->
-        <div class="modal" id="pincode-modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modal-pincode-title">Pincode Details</h2>
-                    <button class="modal-close" id="modal-close">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body" id="modal-body">
-                    <!-- Content loaded dynamically -->
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/map.js"></script>
-    <script src="js/tables.js"></script>
-    <script src="js/app.js"></script>
+    </footer>
+
+    <!-- Init AOS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50,
+            easing: 'ease-out-cubic'
+        });
+    </script>
 </body>
+
 </html>

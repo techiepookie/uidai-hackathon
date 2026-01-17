@@ -1,0 +1,129 @@
+{
+  "training_timestamp": "2026-01-17T14:15:18.799988",
+  "samples": 66,
+  "models": {
+    "bio": {
+      "sarima": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\sarima_bio.pkl",
+        "metadata": {
+          "auto_order": true,
+          "stationary": "True",
+          "seasonal_strength": 0.3385041648004625,
+          "differencing_order": 0,
+          "n_samples": 66,
+          "fit_timestamp": "2026-01-17T14:15:18.844355",
+          "aic": 1427.6619323964453,
+          "bic": 1437.222047423586,
+          "hqic": 1431.3024787253298,
+          "nobs": 66,
+          "converged": true
+        },
+        "order": [
+          1,
+          0,
+          1
+        ],
+        "seasonal_order": [
+          1,
+          1,
+          1,
+          7
+        ]
+      },
+      "xgboost": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\xgboost_bio.pkl",
+        "metadata": {
+          "n_samples": 66,
+          "n_features": 19,
+          "in_sample_mae": 568.1393295434805,
+          "in_sample_rmse": 930.7494500034331,
+          "fit_timestamp": "2026-01-17T14:15:18.995178"
+        }
+      }
+    },
+    "demo": {
+      "sarima": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\sarima_demo.pkl",
+        "metadata": {
+          "auto_order": true,
+          "stationary": "False",
+          "seasonal_strength": 0.4676347632022993,
+          "differencing_order": 1,
+          "n_samples": 66,
+          "fit_timestamp": "2026-01-17T14:15:19.078475",
+          "aic": 1379.9039844952886,
+          "bic": 1389.3630859858417,
+          "hqic": 1383.4927544066709,
+          "nobs": 66,
+          "converged": true
+        },
+        "order": [
+          1,
+          1,
+          1
+        ],
+        "seasonal_order": [
+          1,
+          1,
+          1,
+          7
+        ]
+      },
+      "xgboost": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\xgboost_demo.pkl",
+        "metadata": {
+          "n_samples": 66,
+          "n_features": 19,
+          "in_sample_mae": 761.6363971416766,
+          "in_sample_rmse": 1088.928394332316,
+          "fit_timestamp": "2026-01-17T14:15:19.128011"
+        }
+      }
+    },
+    "mobile": {
+      "sarima": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\sarima_mobile.pkl",
+        "metadata": {
+          "auto_order": true,
+          "stationary": false,
+          "seasonal_strength": 0.0,
+          "differencing_order": 1,
+          "n_samples": 66,
+          "fit_timestamp": "2026-01-17T14:15:19.168318",
+          "aic": -1618.6323479422722,
+          "bic": -1612.2029437630977,
+          "hqic": -1616.1036318526203,
+          "nobs": 66,
+          "converged": false
+        },
+        "order": [
+          1,
+          1,
+          1
+        ],
+        "seasonal_order": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "xgboost": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\xgboost_mobile.pkl",
+        "metadata": {
+          "n_samples": 66,
+          "n_features": 19,
+          "in_sample_mae": 0.0,
+          "in_sample_rmse": 0.0,
+          "fit_timestamp": "2026-01-17T14:15:19.183956"
+        }
+      }
+    }
+  }
+}

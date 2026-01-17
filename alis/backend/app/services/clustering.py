@@ -199,8 +199,13 @@ class ClusteringService:
         
         df['cluster_label'] = kmeans.fit_predict(X_scaled)
         
-        # Clear existing clusters
+        # Clear existing cluster references from pincode_metrics first (to avoid FK constraint)
+        self.db.query(PincodeMetric).update({'cluster_id': None})
+        self.db.commit()
+        
+        # Now clear existing clusters
         self.db.query(PincodeCluster).delete()
+        self.db.commit()
         
         # Create clusters and calculate statistics
         for cluster_id in range(n_clusters):
