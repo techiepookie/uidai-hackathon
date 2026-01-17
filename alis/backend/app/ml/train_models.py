@@ -13,6 +13,7 @@ import joblib
 from app.ml.sarima_model import SARIMAModel
 from app.ml.xgboost_model import XGBoostForecaster
 from app.ml.ensemble import EnsembleForecaster
+from app.ml.lstm_model import LSTMForecaster
 from app.config import settings
 from app.database import get_db_context
 from app.models.db_models import RawUpdate
@@ -131,6 +132,40 @@ class ModelTrainer:
                 'status': 'failed',
                 'error': str(e)
             }
+
+    def train_lstm(
+        self,
+        data: np.ndarray,
+        metric_name: str = 'bio'
+    ) -> Dict[str, Any]:
+        """
+        Train LSTM model.
+        """
+        logger.info(f"Training LSTM model for {metric_name}")
+        
+        try:
+            model = LSTMForecaster()
+            model.fit(data)
+            
+            # Save model
+            model_path = self.models_dir / f"lstm_{metric_name}.pkl"
+            model.save(str(model_path))
+            
+            result = {
+                'status': 'success',
+                'model_path': str(model_path),
+                'metadata': model.metadata
+            }
+            
+            logger.info(f"LSTM model saved to {model_path}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"LSTM training failed: {e}")
+            return {
+                'status': 'failed',
+                'error': str(e)
+            }
     
     def train_all(self) -> Dict[str, Any]:
         """
@@ -166,7 +201,8 @@ class ModelTrainer:
             
             results['models'][metric_name] = {
                 'sarima': self.train_sarima(data, metric_name),
-                'xgboost': self.train_xgboost(data, metric_name)
+                'xgboost': self.train_xgboost(data, metric_name),
+                'lstm': self.train_lstm(data, metric_name)
             }
         
         # Save training results
@@ -211,12 +247,15 @@ class ModelTrainer:
             except Exception as e:
                 results[metric_name]['sarima'] = {'error': str(e)}
             
-            # Evaluate XGBoost
-            try:
-                xgb = XGBoostForecaster()
-                results[metric_name]['xgboost'] = xgb.evaluate(train, test)
             except Exception as e:
                 results[metric_name]['xgboost'] = {'error': str(e)}
+            
+            # Evaluate LSTM
+            try:
+                lstm = LSTMForecaster()
+                results[metric_name]['lstm'] = lstm.evaluate(train, test)
+            except Exception as e:
+                results[metric_name]['lstm'] = {'error': str(e)}
             
             # Evaluate Ensemble
             try:

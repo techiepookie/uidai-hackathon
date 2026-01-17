@@ -52,12 +52,13 @@ ALIS provides:
 | Feature | Description | Technology |
 |---------|-------------|------------|
 | **Risk Scoring** | Multi-factor risk calculation (Bio, Demo, Mobile) | Custom Algorithm |
-| **Forecasting** | 30-day bio/demo update predictions | SARIMA + XGBoost |
+| **Forecasting** | 30-day bio/demo update predictions | **SARIMA + XGBoost + LSTM** |
 | **Clustering** | Auto-segmentation into 7 risk clusters | K-Means |
 | **Anomaly Detection** | Spike/Drop detection using multiple methods | Isolation Forest |
 | **Interactive Dashboard** | 6 pages with visualizations | Streamlit + Plotly |
 | **REST API** | Full CRUD operations + ML endpoints | FastAPI |
-| **Geographic Maps** | State-wise and pincode-level mapping | Plotly Mapbox |
+| **Geographic Maps** | High-performance pincode mapping | **Leaflet.js + Stamen** |
+| **Deep Learning** | Time-series forecasting | **TensorFlow (Keras)** |
 
 ---
 
@@ -76,9 +77,9 @@ ALIS provides:
 │         ▼                  ▼                                     │
 │  ┌─────────────────────────────────────────┐                    │
 │  │            ML Pipeline                   │                    │
-│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐   │                    │
-│  │  │ SARIMA  │ │ XGBoost │ │ K-Means │   │                    │
-│  │  └─────────┘ └─────────┘ └─────────┘   │                    │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐  │
+│  │  │ SARIMA  │ │ XGBoost │ │  LSTM   │ │ K-Means │  │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘  │                    │
 │  │  ┌───────────────────┐                  │                    │
 │  │  │ Isolation Forest  │                  │                    │
 │  │  └───────────────────┘                  │                    │
@@ -109,6 +110,7 @@ venv\Scripts\activate     # Windows
 
 # 3. Install dependencies
 pip install -r backend/requirements.txt
+pip install tensorflow  # Required for LSTM
 
 # 4. Place your CSV data files in:
 #    backend/data/raw/api_data_aadhar_biometric/
@@ -149,17 +151,17 @@ python app.py --train-only
 
 ALIS processes three types of Aadhaar update data:
 
-1. **Biometric Updates** (`api_data_aadhar_biometric/`)
-   - Fingerprint, Iris updates by age group
-   - ~1.86M records
+1.  **Biometric Updates** (`api_data_aadhar_biometric/`)
+    - Fingerprint, Iris updates by age group
+    - ~1.86M records
 
-2. **Demographic Updates** (`api_data_aadhar_demographic/`)
-   - Name, Address, DOB changes
-   - ~2.07M records
+2.  **Demographic Updates** (`api_data_aadhar_demographic/`)
+    - Name, Address, DOB changes
+    - ~2.07M records
 
-3. **Enrollment Data** (`api_data_aadhar_enrolment/`)
-   - New Aadhaar registrations
-   - ~1.0M records
+3.  **Enrollment Data** (`api_data_aadhar_enrolment/`)
+    - New Aadhaar registrations
+    - ~1.0M records
 
 ### Processing Steps
 
@@ -203,7 +205,12 @@ CSV Files → Data Ingestion → Merge & Clean → Risk Calculation → ML Train
 - Lag features (7, 14, 30 days)
 - Rolling statistics
 
-**Ensemble**: Weighted average of both models
+**LSTM (Deep Learning)**:
+- Recurrent Neural Network with TensorFlow/Keras
+- Captures long-term temporal dependencies
+- Auto-regressive multi-step forecasting
+
+**Ensemble**: Weighted average of all three models
 
 ### 3. K-Means Clustering
 

@@ -227,21 +227,19 @@
                 <span class="flex items-center gap-2">
                     <div class="w-1.5 h-1.5 rounded-full bg-sys-signal animate-pulse"></div> PIN 110001: RISK CRITICAL
                 </span>
-                <span class="flex items-center gap-2 text-sys-text">MODEL UPDATED: SARIMA_V4.2</span>
+                <span class="flex items-center gap-2 text-sys-text">MODEL UPDATED: LSTM_NET_V1.0</span>
                 <span class="flex items-center gap-2">
-                    <div class="w-1.5 h-1.5 rounded-full bg-sys-error"></div> ANOMALY DETECTED: BIOMETRIC SPIKE (SECTOR
-                    4)
+                    <div class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div> TENSORFLOW CORE: ONLINE
                 </span>
                 <span class="flex items-center gap-2 text-sys-text">DATA INGESTION: 3.7M RECORDS</span>
-                <span class="flex items-center gap-2 text-sys-text">API LATENCY: 24ms</span>
+                <span class="flex items-center gap-2 text-sys-text">LEAFLET MAP: INTERACTIVE</span>
                 <!-- Duplicate for loop -->
                 <span class="flex items-center gap-2">
                     <div class="w-1.5 h-1.5 rounded-full bg-sys-signal animate-pulse"></div> PIN 110001: RISK CRITICAL
                 </span>
-                <span class="flex items-center gap-2 text-sys-text">MODEL UPDATED: SARIMA_V4.2</span>
+                <span class="flex items-center gap-2 text-sys-text">MODEL UPDATED: LSTM_NET_V1.0</span>
                 <span class="flex items-center gap-2">
-                    <div class="w-1.5 h-1.5 rounded-full bg-sys-error"></div> ANOMALY DETECTED: BIOMETRIC SPIKE (SECTOR
-                    4)
+                    <div class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div> TENSORFLOW CORE: ONLINE
                 </span>
             </div>
         </div>
@@ -344,9 +342,9 @@
                     <div
                         class="mt-12 pt-8 border-t border-neutral-200 dark:border-sys-border flex flex-wrap gap-6 text-neutral-400 dark:text-neutral-600 font-mono text-xs uppercase tracking-wider">
                         <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> Python 3.12</span>
+                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> TensorFlow</span>
+                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> Leaflet.js</span>
                         <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> FastAPI</span>
-                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> XGBoost</span>
-                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> SQLite</span>
                     </div>
                 </div>
 
@@ -370,7 +368,8 @@
                                 { t: 1200, text: '> LOADING ML MODELS:' },
                                 { t: 1500, text: '  - SARIMA_FORECAST (v4.2)... READY' },
                                 { t: 1800, text: '  - XGBOOST_RISK (v2.1)... READY' },
-                                { t: 2100, text: '  - ISOLATION_FOREST... READY' },
+                                { t: 2100, text: '  - LSTM_NEURAL_NET (TensorFlow)... ACTIVE' },
+                                { t: 2400, text: '  - ISOLATION_FOREST... READY' },
                                 { t: 2500, text: '> CONNECTING TO SECURE GATEWAY...' },
                                 { t: 3000, text: '> SYSTEM ONLINE. LISTENING ON PORT 8000.' },
                                 { t: 3500, text: '> _' }
@@ -713,9 +712,13 @@
                             <span>SARIMA</span>
                             <span>(1,1,1)(1,1,1)12</span>
                         </div>
-                        <div class="flex justify-between text-neutral-500">
+                        <div class="flex justify-between mb-1 text-neutral-500">
                             <span>XGBoost</span>
                             <span>Lag: 7, 14, 30</span>
+                        </div>
+                        <div class="flex justify-between text-purple-500 font-bold">
+                            <span>LSTM (New)</span>
+                            <span>Relu, 50 Epochs</span>
                         </div>
                     </div>
                 </div>

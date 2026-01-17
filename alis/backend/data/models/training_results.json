@@ -1,5 +1,5 @@
 {
-  "training_timestamp": "2026-01-17T15:15:49.554441",
+  "training_timestamp": "2026-01-17T15:53:53.185962",
   "samples": 66,
   "models": {
     "bio": {
@@ -12,7 +12,7 @@
           "seasonal_strength": 0.3385041648004625,
           "differencing_order": 0,
           "n_samples": 66,
-          "fit_timestamp": "2026-01-17T15:15:49.679563",
+          "fit_timestamp": "2026-01-17T15:53:53.221440",
           "aic": 1427.6619323964453,
           "bic": 1437.222047423586,
           "hqic": 1431.3024787253298,
@@ -39,7 +39,18 @@
           "n_features": 19,
           "in_sample_mae": 568.1393295434805,
           "in_sample_rmse": 930.7494500034331,
-          "fit_timestamp": "2026-01-17T15:15:50.004839"
+          "fit_timestamp": "2026-01-17T15:53:53.373026"
+        }
+      },
+      "lstm": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\lstm_bio.pkl",
+        "metadata": {
+          "in_sample_mae": 260541.421875,
+          "in_sample_rmse": 306603.4375,
+          "aic": 22215.86328125,
+          "epochs": 50,
+          "look_back": 14
         }
       }
     },
@@ -53,7 +64,7 @@
           "seasonal_strength": 0.4676347632022993,
           "differencing_order": 1,
           "n_samples": 66,
-          "fit_timestamp": "2026-01-17T15:15:50.121420",
+          "fit_timestamp": "2026-01-17T15:53:56.901447",
           "aic": 1379.9039844952886,
           "bic": 1389.3630859858417,
           "hqic": 1383.4927544066709,
@@ -80,7 +91,18 @@
           "n_features": 19,
           "in_sample_mae": 761.6363971416766,
           "in_sample_rmse": 1088.928394332316,
-          "fit_timestamp": "2026-01-17T15:15:50.182490"
+          "fit_timestamp": "2026-01-17T15:53:56.945977"
+        }
+      },
+      "lstm": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\lstm_demo.pkl",
+        "metadata": {
+          "in_sample_mae": 201642.21875,
+          "in_sample_rmse": 237798.46875,
+          "aic": 22189.43359375,
+          "epochs": 50,
+          "look_back": 14
         }
       }
     },
@@ -94,7 +116,7 @@
           "seasonal_strength": 0.0,
           "differencing_order": 1,
           "n_samples": 66,
-          "fit_timestamp": "2026-01-17T15:15:50.238626",
+          "fit_timestamp": "2026-01-17T15:53:58.815556",
           "aic": -1618.6323479422722,
           "bic": -1612.2029437630977,
           "hqic": -1616.1036318526203,
@@ -121,7 +143,18 @@
           "n_features": 19,
           "in_sample_mae": 0.0,
           "in_sample_rmse": 0.0,
-          "fit_timestamp": "2026-01-17T15:15:50.265170"
+          "fit_timestamp": "2026-01-17T15:53:58.831515"
+        }
+      },
+      "lstm": {
+        "status": "success",
+        "model_path": "N:\\Downloads\\uidai-hackathon\\alis\\backend\\data\\models\\lstm_mobile.pkl",
+        "metadata": {
+          "in_sample_mae": 0.0,
+          "in_sample_rmse": 0.0,
+          "aic": Infinity,
+          "epochs": 50,
+          "look_back": 14
         }
       }
     }

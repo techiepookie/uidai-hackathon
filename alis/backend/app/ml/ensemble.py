@@ -23,25 +23,22 @@ class EnsembleForecaster:
     
     def __init__(
         self,
-        sarima_weight: float = 0.6,
-        xgboost_weight: float = 0.4
+        sarima_weight: float = 0.4,
+        xgboost_weight: float = 0.3,
+        lstm_weight: float = 0.3
     ):
         self.sarima_weight = sarima_weight
         self.xgboost_weight = xgboost_weight
+        self.lstm_weight = lstm_weight
         self.sarima_model = None
         self.xgboost_model = None
+        self.lstm_model = None
         self.is_fitted = False
         self.metadata = {}
     
     def fit(self, data: np.ndarray) -> 'EnsembleForecaster':
         """
-        Fit both models on the data.
-        
-        Args:
-            data: Time series values (1D numpy array)
-            
-        Returns:
-            Self for chaining
+        Fit all models on the data.
         """
         if len(data) < 10:
             logger.warning("Insufficient data for ensemble, using simple model")
@@ -57,30 +54,63 @@ class EnsembleForecaster:
             logger.error(f"SARIMA fitting failed: {e}")
             self.sarima_model = None
         
-        # Fit XGBoost model (try import, fallback if not available)
+        # Fit XGBoost model
         try:
             from app.ml.xgboost_model import XGBoostForecaster
             self.xgboost_model = XGBoostForecaster()
             self.xgboost_model.fit(data)
             logger.info("XGBoost model fitted successfully")
-        except ImportError:
-            logger.warning("XGBoost model not available, using SARIMA only")
-            self.xgboost_model = None
-            self.sarima_weight = 1.0
-            self.xgboost_weight = 0.0
         except Exception as e:
-            logger.error(f"XGBoost fitting failed: {e}")
+            logger.warning(f"XGBoost model failed: {e}")
             self.xgboost_model = None
-            self.sarima_weight = 1.0
-            self.xgboost_weight = 0.0
+            
+        # Fit LSTM model
+        try:
+            from app.ml.lstm_model import LSTMForecaster
+            self.lstm_model = LSTMForecaster()
+            self.lstm_model.fit(data)
+            logger.info("LSTM model fitted successfully")
+        except Exception as e:
+            logger.warning(f"LSTM model failed: {e}")
+            self.lstm_model = None
         
-        self.is_fitted = self.sarima_model is not None or self.xgboost_model is not None
+        # Adjust weights if models failed
+        models_status = {
+            'sarima': self.sarima_model is not None,
+            'xgboost': self.xgboost_model is not None,
+            'lstm': self.lstm_model is not None
+        }
+        
+        # Recalculate weights if some failed
+        active_weights = 0
+        if models_status['sarima']: active_weights += self.sarima_weight
+        if models_status['xgboost']: active_weights += self.xgboost_weight
+        if models_status['lstm']: active_weights += self.lstm_weight
+        
+        if active_weights > 0:
+            if models_status['sarima']: self.sarima_weight /= active_weights
+            else: self.sarima_weight = 0
+            
+            if models_status['xgboost']: self.xgboost_weight /= active_weights
+            else: self.xgboost_weight = 0
+            
+            if models_status['lstm']: self.lstm_weight /= active_weights
+            else: self.lstm_weight = 0
+        else:
+            # Fallback
+            self.sarima_weight = 0
+            self.xgboost_weight = 0
+            self.lstm_weight = 0
+        
+        self.is_fitted = any(models_status.values())
         
         self.metadata = {
-            'sarima_fitted': self.sarima_model is not None,
-            'xgboost_fitted': self.xgboost_model is not None,
+            'sarima_fitted': models_status['sarima'],
+            'xgboost_fitted': models_status['xgboost'],
+            'lstm_fitted': models_status['lstm'],
             'sarima_weight': self.sarima_weight,
             'xgboost_weight': self.xgboost_weight,
+            'lstm_weight': self.lstm_weight,
             'n_samples': len(data)
         }
         
@@ -91,16 +121,7 @@ class EnsembleForecaster:
         data: np.ndarray = None,
         horizon: int = 30
     ) -> np.ndarray:
-        """
-        Generate ensemble predictions.
-        
-        Args:
-            data: Historical data (optional if already fitted)
-            horizon: Number of steps to forecast
-            
-        Returns:
-            Array of predictions
-        """
+        """Generate ensemble predictions."""
         # Fit if not already fitted
         if not self.is_fitted and data is not None:
             self.fit(data)
@@ -120,7 +141,6 @@ class EnsembleForecaster:
                 sarima_preds, _ = self.sarima_model.predict(horizon, return_conf_int=False)
                 predictions.append(sarima_preds)
                 weights.append(self.sarima_weight)
-                logger.debug("SARIMA predictions generated")
             except Exception as e:
                 logger.error(f"SARIMA prediction failed: {e}")
         
@@ -130,20 +150,28 @@ class EnsembleForecaster:
                 xgb_preds = self.xgboost_model.predict(horizon)
                 predictions.append(xgb_preds)
                 weights.append(self.xgboost_weight)
-                logger.debug("XGBoost predictions generated")
             except Exception as e:
                 logger.error(f"XGBoost prediction failed: {e}")
+                
+        # Get LSTM predictions
+        if self.lstm_model is not None:
+            try:
+                lstm_preds = self.lstm_model.predict(horizon)
+                predictions.append(lstm_preds)
+                weights.append(self.lstm_weight)
+            except Exception as e:
+                logger.error(f"LSTM prediction failed: {e}")
         
         if len(predictions) == 0:
             # Complete fallback
-            logger.warning("All models failed, using simple average")
             if data is not None and len(data) > 0:
                 return np.full(horizon, np.mean(data[-7:]))
             return np.zeros(horizon)
         
         # Weighted average
         weights = np.array(weights)
-        weights = weights / weights.sum()  # Normalize
+        if weights.sum() > 0:
+            weights = weights / weights.sum()
         
         ensemble_pred = np.zeros(horizon)
         for pred, weight in zip(predictions, weights):
@@ -153,52 +181,13 @@ class EnsembleForecaster:
         ensemble_pred = np.maximum(ensemble_pred, 0)
         
         return ensemble_pred
-    
-    def forecast(
-        self,
-        data: np.ndarray,
-        horizon: int = 30
-    ) -> Dict[str, Any]:
-        """
-        Complete forecasting pipeline.
-        
-        Args:
-            data: Historical time series data
-            horizon: Forecast horizon in days
-            
-        Returns:
-            Dictionary with forecasts and metadata
-        """
-        # Fit on data
-        self.fit(data)
-        
-        # Generate predictions
-        predictions = self.predict(data, horizon)
-        
-        # Calculate confidence intervals (simple approach)
-        recent_std = np.std(data[-30:]) if len(data) >= 30 else np.std(data)
-        conf_multiplier = np.linspace(1.0, 2.0, horizon)  # Wider as we go further
-        
-        lower_bound = predictions - 1.96 * recent_std * conf_multiplier
-        upper_bound = predictions + 1.96 * recent_std * conf_multiplier
-        
-        # Ensure non-negative bounds
-        lower_bound = np.maximum(lower_bound, 0)
-        
-        return {
-            'predictions': predictions.tolist(),
-            'lower_bound': lower_bound.tolist(),
-            'upper_bound': upper_bound.tolist(),
-            'metadata': self.metadata,
-            'model_used': 'ensemble'
-        }
-    
+
     def get_model_contributions(self) -> Dict[str, float]:
         """Get the contribution weights of each model."""
-        total = self.sarima_weight + self.xgboost_weight
         return {
-            'sarima': self.sarima_weight / total if total > 0 else 0,
-            'xgboost': self.xgboost_weight / total if total > 0 else 0
+            'sarima': self.sarima_weight,
+            'xgboost': self.xgboost_weight,
+            'lstm': self.lstm_weight
         }
 
 

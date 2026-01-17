@@ -59,6 +59,7 @@ backend/data/alis.db
 *.joblib
 *.h5
 *.model
+*.keras
 backend/data/models/*.pkl
 
 # =====================
