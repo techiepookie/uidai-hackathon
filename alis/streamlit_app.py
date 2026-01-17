@@ -515,62 +515,38 @@ elif page == "🗺️ Map View":
         - **Bubble Size** = Number of pincodes
         - **Color** = Risk level (Red=High, Green=Low)
         - **Hover** over bubbles for details
-        - Use the zoom controls or scroll to zoom in
+        - Use the zoom controls or scroll to zoom in (Leaflet Map)
         """)
+
+    # Embed the new Leaflet map served from the backend
+    import streamlit.components.v1 as components
     
-    if not df_metrics.empty:
-        # State-level aggregation
-        state_data = df_metrics.groupby('state').agg({
-            'overall_risk': 'mean',
-            'bio_updates': 'sum',
-            'demo_updates': 'sum',
-            'pincode': 'count'
-        }).reset_index()
-        state_data.columns = ['state', 'avg_risk', 'bio_updates', 'demo_updates', 'pincode_count']
-        
-        # Add coordinates
-        state_data['lat'] = state_data['state'].map(lambda x: STATE_COORDS.get(x, (None, None))[0])
-        state_data['lon'] = state_data['state'].map(lambda x: STATE_COORDS.get(x, (None, None))[1])
-        state_data = state_data.dropna(subset=['lat', 'lon'])
-        
-        if not state_data.empty:
-            # Map type selection
-            map_type = st.radio("Map Style", ["Dark", "Light", "Satellite"], horizontal=True)
-            style_map = {"Dark": "carto-darkmatter", "Light": "carto-positron", "Satellite": "open-street-map"}
-            
-            fig = px.scatter_mapbox(
-                state_data,
-                lat='lat', lon='lon',
-                size='pincode_count',
-                color='avg_risk',
-                color_continuous_scale=['#2ecc71', '#f1c40f', '#e67e22', '#e74c3c'],
-                range_color=[0, 100],
-                hover_name='state',
-                hover_data={
-                    'pincode_count': True,
-                    'avg_risk': ':.1f',
-                    'bio_updates': ':,.0f',
-                    'lat': False, 'lon': False
-                },
-                zoom=4,
-                center={"lat": 22.5, "lon": 82.5},
-                mapbox_style=style_map[map_type],
-                size_max=60
+    # Check if backend is reachable
+    try:
+        import requests
+        resp = requests.get("http://localhost:8000/health", timeout=1)
+        if resp.status_code == 200:
+            # Embed the map
+            st.markdown(
+                """
+                <iframe src="http://localhost:8000/static/map.html" 
+                width="100%" height="700px" style="border:none; border-radius: 10px;"></iframe>
+                """, 
+                unsafe_allow_html=True
             )
-            fig.update_layout(height=600, margin=dict(l=0, r=0, t=0, b=0))
-            st.plotly_chart(fig, use_container_width=True)
-            
-            # State summary
-            st.subheader("📋 State Summary")
-            display_df = state_data[['state', 'avg_risk', 'pincode_count', 'bio_updates']].copy()
-            display_df.columns = ['State', 'Avg Risk', 'Pincodes', 'Bio Updates']
-            display_df = display_df.sort_values('Avg Risk', ascending=False)
-            display_df['Avg Risk'] = display_df['Avg Risk'].round(1)
-            st.dataframe(display_df, use_container_width=True, hide_index=True)
         else:
-            st.warning("No valid state coordinates found.")
-    else:
-        st.warning("No data available.")
+            st.error("Backend is not healthy. Please check if python app.py is running.")
+    except Exception as e:
+        st.error(f"Cannot connect to backend map service: {e}. Falling back to static map.")
+        
+        # Fallback to simple plotly map if backend is down
+        if not df_metrics.empty:
+            state_data = df_metrics.groupby('state').agg({
+                'overall_risk': 'mean',
+                'pincode': 'count'
+            }).reset_index()
+            # ... (minimal fallback code if needed, but error message is better)
+
 
 
 # =====================

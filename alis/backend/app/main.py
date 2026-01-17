@@ -11,7 +11,9 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import time
 from datetime import datetime
+from pathlib import Path
 from loguru import logger
+import os
 
 from app.config import settings
 from app.database import engine, Base, init_database
@@ -48,6 +50,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount Frontend directory as static files
+# We need to go up from backend/app/main.py -> backend/app -> backend -> alis -> Frontend
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+FRONTEND_DIR = BASE_DIR / "Frontend"
+
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+    logger.info(f"Mounted static files from {FRONTEND_DIR}")
+else:
+    logger.warning(f"Frontend directory not found at {FRONTEND_DIR}")
 
 
 # Request logging middleware

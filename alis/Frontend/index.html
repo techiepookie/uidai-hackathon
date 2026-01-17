@@ -1,16 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth antialiased">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALIS | Aadhaar Lifecycle Intelligence System</title>
+    <meta name="description" content="ALIS - Aadhaar Lifecycle Intelligence System. Advanced AI analytics for UIDAI.">
+    <title>ALIS | Mission Critical Intelligence</title>
 
-    <!-- Fonts: Inter (Strict, Clean, Government Standard) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <!-- 
+        FONTS: 
+        1. Inter: Standard interface font.
+        2. JetBrains Mono: Developer/Data font.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <!-- Tailwind CSS -->
+    <!-- ICONS: Phosphor (SVG) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- LOGIC: Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <!-- STYLING: Tailwind CSS (Configured via Script for Customization) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,22 +33,46 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        // We are defining a strict monochrome palette
-                        // No blues, no purples. Just Black, White, and Gray.
-                        mono: {
-                            50: '#f9fafb',
-                            100: '#f3f4f6',
-                            200: '#e5e7eb',
-                            300: '#d1d5db',
-                            400: '#9ca3af',
-                            500: '#6b7280',
-                            600: '#4b5563',
-                            700: '#374151',
-                            800: '#1f2937',
-                            900: '#111827',
-                            950: '#030712', // Almost pure black
+                        // The "System" Palette - Strict Monochrome
+                        sys: {
+                            black: '#050505',
+                            dark: '#0a0a0a',
+                            panel: '#111111',
+                            border: '#262626',
+                            text: '#a3a3a3',
+                            white: '#ffffff',
+                            light: '#f5f5f5',
+                            // The "Signal" Color - For status indicators only
+                            signal: '#00ff9d',
+                            signal_dim: 'rgba(0, 255, 157, 0.1)',
+                            error: '#ff3333',
+                            warning: '#ffcc00'
+                        }
+                    },
+                    backgroundImage: {
+                        'grid-white': "linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px)",
+                        'grid-black': "linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)",
+                    },
+                    animation: {
+                        'scan': 'scan 4s linear infinite',
+                        'cursor': 'cursor 1s step-end infinite',
+                        'ticker': 'ticker 30s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' }
+                        },
+                        cursor: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' }
+                        },
+                        ticker: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-100%)' }
                         }
                     }
                 }
@@ -42,357 +80,839 @@
         }
     </script>
 
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- AOS Animation -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <!-- CUSTOM CSS FOR ADVANCED EFFECTS -->
     <style>
-        /* Precision Scrollbar */
+        /* Base Reset & Scrollbar */
+        html,
+        body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: #00ff9d;
+            color: #000;
+        }
+
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #000;
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 0px;
+            background: #444;
+            border-radius: 0;
         }
 
-        /* Smooth section focusing */
-        section {
-            scroll-margin-top: 100px;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff9d;
         }
 
-        /* Video Container Aspect Ratio */
-        .video-container {
+        /* Noise Texture (Film Grain) */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* CRT Scanline Effect (Subtle) */
+        .scanline {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            z-index: 10;
+            animation: scan 5s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Technical Corners */
+        .corner-brackets {
+            position: relative;
+        }
+
+        .corner-brackets::before,
+        .corner-brackets::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-color: currentColor;
+            border-style: solid;
+            transition: all 0.3s ease;
+        }
+
+        .corner-brackets::before {
+            top: 0;
+            left: 0;
+            border-width: 1px 0 0 1px;
+        }
+
+        .corner-brackets::after {
+            bottom: 0;
+            right: 0;
+            border-width: 0 1px 1px 0;
+        }
+
+        /* Video Container Aspect Ratio 16:9 */
+        .aspect-video-container {
             position: relative;
             padding-bottom: 56.25%;
-            /* 16:9 */
             height: 0;
             overflow: hidden;
+            background: #000;
         }
 
-        .video-container iframe {
+        .aspect-video-container iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
         }
+
+        /* Graph Paper Grid */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, transparent, 10%, black, 90%, transparent);
+        }
+
+        /* Utility: Hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
-<body
-    class="font-sans antialiased text-neutral-900 bg-white dark:bg-black dark:text-neutral-100 transition-colors duration-200"
-    x-data="{ 
+<body class="bg-white text-neutral-900 dark:bg-sys-black dark:text-sys-text transition-colors duration-200" x-data="{ 
           darkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
-          activeSection: 'home',
           toggleTheme() {
               this.darkMode = !this.darkMode;
               localStorage.setItem('theme', this.darkMode ? 'dark' : 'light');
-              if (this.darkMode) {
-                  document.documentElement.classList.add('dark');
-              } else {
-                  document.documentElement.classList.remove('dark');
-              }
+              if (this.darkMode) document.documentElement.classList.add('dark');
+              else document.documentElement.classList.remove('dark');
           },
-          init() {
-              if(this.darkMode) document.documentElement.classList.add('dark');
-              
-              // Scroll Spy Logic
-              const observer = new IntersectionObserver((entries) => {
-                  entries.forEach(entry => {
-                      if (entry.isIntersecting) {
-                          this.activeSection = entry.target.id;
-                      }
-                  });
-              }, { threshold: 0.5 });
+          mobileMenuOpen: false,
+          activeTab: 'overview'
+      }"
+    x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')); if(darkMode) document.documentElement.classList.add('dark');">
 
-              document.querySelectorAll('section').forEach(section => {
-                  observer.observe(section);
-              });
-          }
-      }">
+    <!-- FILM GRAIN OVERLAY -->
+    <div class="noise-overlay"></div>
 
-    <!-- Navigation -->
+    <!-- LIVE INTELLIGENCE TICKER -->
+    <div
+        class="w-full bg-neutral-100 dark:bg-sys-panel border-b border-neutral-200 dark:border-sys-border h-8 flex items-center overflow-hidden z-50 relative font-mono text-[10px] tracking-widest uppercase">
+        <div class="px-4 h-full flex items-center bg-sys-signal text-black font-bold shrink-0">
+            System Live
+        </div>
+        <div class="flex-1 overflow-hidden relative">
+            <div class="animate-ticker whitespace-nowrap flex items-center gap-12 absolute top-0 bottom-0">
+                <span class="flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 rounded-full bg-sys-signal animate-pulse"></div> PIN 110001: RISK CRITICAL
+                </span>
+                <span class="flex items-center gap-2 text-sys-text">MODEL UPDATED: SARIMA_V4.2</span>
+                <span class="flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 rounded-full bg-sys-error"></div> ANOMALY DETECTED: BIOMETRIC SPIKE (SECTOR
+                    4)
+                </span>
+                <span class="flex items-center gap-2 text-sys-text">DATA INGESTION: 3.7M RECORDS</span>
+                <span class="flex items-center gap-2 text-sys-text">API LATENCY: 24ms</span>
+                <!-- Duplicate for loop -->
+                <span class="flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 rounded-full bg-sys-signal animate-pulse"></div> PIN 110001: RISK CRITICAL
+                </span>
+                <span class="flex items-center gap-2 text-sys-text">MODEL UPDATED: SARIMA_V4.2</span>
+                <span class="flex items-center gap-2">
+                    <div class="w-1.5 h-1.5 rounded-full bg-sys-error"></div> ANOMALY DETECTED: BIOMETRIC SPIKE (SECTOR
+                    4)
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN NAVIGATION -->
     <nav
-        class="fixed w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
+        class="sticky top-0 z-40 w-full bg-white/90 dark:bg-sys-black/90 backdrop-blur-md border-b border-neutral-200 dark:border-sys-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
+            <div class="flex justify-between items-center h-16">
+                <!-- LOGO -->
                 <div class="flex items-center gap-3">
                     <div
-                        class="flex items-center justify-center w-8 h-8 rounded bg-black dark:bg-white text-white dark:text-black">
+                        class="w-8 h-8 bg-black dark:bg-white text-white dark:text-black flex items-center justify-center rounded-sm">
                         <i class="ph-bold ph-shield-check text-lg"></i>
                     </div>
-                    <span class="text-xl font-bold tracking-tight">ALIS</span>
+                    <div class="flex flex-col">
+                        <span class="font-bold tracking-tight text-lg leading-none">ALIS</span>
+                        <span class="font-mono text-[10px] text-neutral-500 uppercase leading-none mt-0.5">UIDAI
+                            INTEL</span>
+                    </div>
                 </div>
 
-                <!-- Desktop Menu with Scroll Highlighting -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#home"
-                        :class="activeSection === 'home' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
-                        class="text-sm transition-colors duration-200">
-                        Overview
-                    </a>
-                    <a href="#demo"
-                        :class="activeSection === 'demo' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
-                        class="text-sm transition-colors duration-200">
-                        Live Demo
-                    </a>
-                    <a href="#stats"
-                        :class="activeSection === 'stats' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
-                        class="text-sm transition-colors duration-200">
-                        Impact
-                    </a>
-                    <a href="#features"
-                        :class="activeSection === 'features' ? 'text-black dark:text-white font-semibold' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'"
-                        class="text-sm transition-colors duration-200">
-                        System
-                    </a>
+                <!-- DESKTOP MENU -->
+                <div class="hidden md:flex items-center gap-8 text-xs font-medium uppercase tracking-wider font-mono">
+                    <a href="#video" class="hover:text-sys-signal transition-colors">Demo</a>
+                    <a href="#architecture" class="hover:text-sys-signal transition-colors">System</a>
+                    <a href="#data" class="hover:text-sys-signal transition-colors">Data</a>
+                    <a href="#api" class="hover:text-sys-signal transition-colors">API</a>
 
-                    <div class="h-6 w-px bg-neutral-200 dark:bg-neutral-800 mx-2"></div>
+                    <div class="h-4 w-px bg-neutral-300 dark:bg-sys-border"></div>
 
-                    <!-- Theme Toggle -->
-                    <button @click="toggleTheme()"
-                        class="text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
-                        <i class="ph-fill ph-sun text-lg" x-show="!darkMode"></i>
-                        <i class="ph-fill ph-moon text-lg" x-show="darkMode" style="display: none;"></i>
+                    <!-- THEME TOGGLE -->
+                    <button @click="toggleTheme()" class="hover:text-sys-signal transition-colors">
+                        <span x-show="!darkMode">LIGHT</span>
+                        <span x-show="darkMode">DARK</span>
                     </button>
 
                     <!-- CTA -->
                     <a href="http://localhost:8501" target="_blank"
-                        class="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-semibold rounded hover:opacity-80 transition-opacity">
+                        class="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-sm hover:opacity-80 transition-opacity">
+                        <i class="ph-bold ph-squares-four"></i>
                         Dashboard
                     </a>
                 </div>
+
+                <!-- MOBILE MENU BUTTON -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-2xl">
+                    <i class="ph-bold ph-list"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="relative pt-32 pb-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-4xl mx-auto mb-16" data-aos="fade-up">
-                <div
-                    class="inline-block border border-neutral-200 dark:border-neutral-800 rounded-full px-4 py-1.5 mb-8">
-                    <span
-                        class="text-xs font-mono font-medium text-neutral-600 dark:text-neutral-400 uppercase tracking-widest">
-                        UIDAI Hackathon 2026
-                    </span>
-                </div>
-
-                <h1 class="text-6xl md:text-8xl font-bold tracking-tighter text-black dark:text-white mb-8">
-                    Lifecycle<br>
-                    <span class="text-neutral-500 dark:text-neutral-600">Intelligence.</span>
-                </h1>
-
-                <p class="text-xl text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-                    A strictly governed AI system for anomaly detection, kit resource forecasting, and fraud prevention
-                    across the Aadhaar ecosystem.
-                </p>
-
-                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="http://localhost:8501" target="_blank"
-                        class="px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-semibold rounded text-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-chart-bar"></i>
-                        Launch Dashboard
-                    </a>
-                    <a href="http://localhost:8000/api/docs" target="_blank"
-                        class="px-8 py-4 bg-transparent border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-semibold rounded text-lg hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-code"></i>
-                        Documentation
-                    </a>
-                </div>
-            </div>
+    <!-- HERO SECTION: COMMAND CENTER -->
+    <header
+        class="relative pt-20 pb-20 lg:pt-32 lg:pb-32 border-b border-neutral-200 dark:border-sys-border overflow-hidden">
+        <!-- Background Grid -->
+        <div class="absolute inset-0 bg-grid-white dark:bg-grid-black bg-grid-pattern pointer-events-none opacity-50">
         </div>
-    </section>
 
-    <!-- Video Section -->
-    <section id="demo" class="py-12 bg-white dark:bg-black">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-black dark:text-white">System Demonstration</h2>
-                <p class="text-neutral-500 mt-2">See how ALIS detects anomalies in real-time.</p>
-            </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-5 gap-16 items-center">
 
-            <!-- Video Container -->
-            <div class="relative rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-2xl bg-neutral-100 dark:bg-neutral-900"
-                data-aos="zoom-in">
-                <!-- Replace 'YOUR_VIDEO_ID' with actual ID. 
-                     Using a placeholder div for now, but configured for YouTube -->
-                <div class="video-container">
-                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=1" title="ALIS Demo Video"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-            </div>
-        </div>
-    </section>
+                <!-- LEFT: TEXT CONTENT -->
+                <div class="lg:col-span-3">
+                    <div
+                        class="inline-flex items-center gap-2 mb-6 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-panel px-3 py-1 rounded-sm">
+                        <span class="w-2 h-2 rounded-full bg-sys-signal animate-pulse"></span>
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-neutral-500">System
+                            v4.0.2 Stable</span>
+                    </div>
 
-    <!-- Stats Section (High Contrast Grid) -->
-    <section id="stats"
-        class="py-24 border-y border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div
-                class="grid grid-cols-2 md:grid-cols-4 gap-px bg-neutral-200 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-800">
-                <div class="bg-white dark:bg-black p-10 text-center">
-                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">19k</div>
-                    <div class="text-sm font-mono text-neutral-500 uppercase">Pincodes</div>
-                </div>
-                <div class="bg-white dark:bg-black p-10 text-center">
-                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">3.7M</div>
-                    <div class="text-sm font-mono text-neutral-500 uppercase">Records</div>
-                </div>
-                <div class="bg-white dark:bg-black p-10 text-center">
-                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">87%</div>
-                    <div class="text-sm font-mono text-neutral-500 uppercase">Accuracy</div>
-                </div>
-                <div class="bg-white dark:bg-black p-10 text-center">
-                    <div class="text-5xl font-bold tracking-tighter text-black dark:text-white mb-2">7</div>
-                    <div class="text-sm font-mono text-neutral-500 uppercase">Risk Clusters</div>
-                </div>
-            </div>
-        </div>
-    </section>
+                    <h1
+                        class="text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-black dark:text-white mb-6 leading-[0.9]">
+                        LIFECYCLE<br>
+                        <span class="text-neutral-400 dark:text-neutral-600">INTELLIGENCE.</span>
+                    </h1>
 
-    <!-- Features Section (The Pipeline) -->
-    <section id="features" class="py-24 bg-white dark:bg-black">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-3 gap-12">
-                <!-- Col 1 -->
-                <div class="space-y-12">
-                    <div class="border-l-2 border-black dark:border-white pl-6" data-aos="fade-up">
-                        <i class="ph-bold ph-shield-warning text-3xl mb-4 block"></i>
-                        <h3 class="text-xl font-bold text-black dark:text-white mb-2">Fraud Detection</h3>
-                        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                            Isolation Forest algorithms identify operators gaming the system through intentional
-                            biometric failures.
-                        </p>
+                    <p
+                        class="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 mb-8 max-w-2xl font-light leading-relaxed">
+                        The Aadhaar Lifecycle Intelligence System (ALIS) leverages advanced machine learning to secure
+                        identity infrastructure across 19,815 pincodes.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 font-mono text-sm">
+                        <a href="http://localhost:8501"
+                            class="h-12 px-6 bg-black dark:bg-white text-white dark:text-black font-bold rounded-sm flex items-center justify-center gap-2 border border-black dark:border-white hover:bg-transparent hover:text-black dark:hover:bg-transparent dark:hover:text-white transition-all">
+                            INITIALIZE DASHBOARD
+                            <i class="ph-bold ph-arrow-right"></i>
+                        </a>
+                        <a href="http://localhost:8000/api/docs"
+                            class="h-12 px-6 bg-transparent text-black dark:text-white font-bold rounded-sm flex items-center justify-center gap-2 border border-neutral-300 dark:border-sys-border hover:bg-neutral-100 dark:hover:bg-sys-panel transition-all">
+                            <i class="ph-bold ph-code"></i>
+                            READ DOCUMENTATION
+                        </a>
+                    </div>
+
+                    <!-- TECH STACK LINE -->
+                    <div
+                        class="mt-12 pt-8 border-t border-neutral-200 dark:border-sys-border flex flex-wrap gap-6 text-neutral-400 dark:text-neutral-600 font-mono text-xs uppercase tracking-wider">
+                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> Python 3.12</span>
+                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> FastAPI</span>
+                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> XGBoost</span>
+                        <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle"></i> SQLite</span>
                     </div>
                 </div>
 
-                <!-- Col 2 -->
-                <div class="space-y-12">
-                    <div class="border-l-2 border-black dark:border-white pl-6" data-aos="fade-up" data-aos-delay="100">
-                        <i class="ph-bold ph-trend-up text-3xl mb-4 block"></i>
-                        <h3 class="text-xl font-bold text-black dark:text-white mb-2">SARIMA Forecasting</h3>
-                        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                            Predictive modeling for enrollment center footfall, allowing proactive kit reallocation 30
-                            days in advance.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Col 3 -->
-                <div class="space-y-12">
-                    <div class="border-l-2 border-black dark:border-white pl-6" data-aos="fade-up" data-aos-delay="200">
-                        <i class="ph-bold ph-map-pin text-3xl mb-4 block"></i>
-                        <h3 class="text-xl font-bold text-black dark:text-white mb-2">Geo-Clustering</h3>
-                        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                            K-Means clustering automatically segments districts into high-efficiency or dark zones for
-                            nodal officer review.
-                        </p>
+                <!-- RIGHT: TERMINAL SIMULATION -->
+                <div class="lg:col-span-2 hidden lg:block">
+                    <div
+                        class="w-full bg-sys-black border border-sys-border rounded-lg shadow-2xl overflow-hidden font-mono text-xs">
+                        <div
+                            class="flex items-center justify-between px-4 py-2 bg-sys-panel border-b border-sys-border">
+                            <span class="text-neutral-500">root@alis-core:~</span>
+                            <div class="flex gap-2">
+                                <div class="w-2.5 h-2.5 rounded-full bg-sys-border"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-sys-border"></div>
+                            </div>
+                        </div>
+                        <div class="p-6 h-80 overflow-y-auto text-neutral-300 space-y-2" x-data="{
+                            lines: [
+                                { t: 0, text: '> INITIALIZING ALIS KERNEL...' },
+                                { t: 400, text: '> MOUNTING DATA VOLUMES (3.7M RECORDS)... OK' },
+                                { t: 800, text: '> VERIFYING INTEGRITY OF 19,815 PINCODES... OK' },
+                                { t: 1200, text: '> LOADING ML MODELS:' },
+                                { t: 1500, text: '  - SARIMA_FORECAST (v4.2)... READY' },
+                                { t: 1800, text: '  - XGBOOST_RISK (v2.1)... READY' },
+                                { t: 2100, text: '  - ISOLATION_FOREST... READY' },
+                                { t: 2500, text: '> CONNECTING TO SECURE GATEWAY...' },
+                                { t: 3000, text: '> SYSTEM ONLINE. LISTENING ON PORT 8000.' },
+                                { t: 3500, text: '> _' }
+                            ],
+                            visibleLines: []
+                        }" x-init="lines.forEach(line => setTimeout(() => visibleLines.push(line.text), line.t))">
+                            <template x-for="line in visibleLines">
+                                <div :class="line === '> _' ? 'animate-pulse text-sys-signal' : ''" x-text="line"></div>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Tech Stack (Minimalist) -->
-    <section class="py-20 border-t border-neutral-200 dark:border-neutral-800">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-sm font-mono text-neutral-500 mb-8 uppercase tracking-widest">Built With</p>
-            <div
-                class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                <!-- Using Text for cleanest look, or Phosphor icons -->
-                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
-                        class="ph-bold ph-python-logo"></i> Python</div>
-                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
-                        class="ph-bold ph-lightning"></i> FastAPI</div>
-                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
-                        class="ph-bold ph-browsers"></i> Streamlit</div>
-                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i class="ph-bold ph-brain"></i>
-                    XGBoost</div>
-                <div class="flex items-center gap-2 text-xl font-bold dark:text-white"><i
-                        class="ph-bold ph-database"></i> SQLite</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer (Solid High Contrast) -->
-    <footer class="bg-black text-white py-16">
+    <!-- SECTION: VIDEO DEMO (THE REQUESTED FEATURE) -->
+    <section id="video" class="py-24 bg-neutral-50 dark:bg-sys-dark border-b border-neutral-200 dark:border-sys-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-8">
                 <div>
-                    <h3 class="text-2xl font-bold mb-6">ALIS</h3>
-                    <p class="text-neutral-400 text-sm leading-relaxed">
+                    <h2 class="text-sm font-mono font-bold uppercase text-sys-signal mb-2">System Demonstration</h2>
+                    <h3 class="text-3xl font-bold text-black dark:text-white">Watch ALIS in Action</h3>
+                </div>
+                <div class="hidden md:block text-right font-mono text-xs text-neutral-500">
+                    <div>RESOLUTION: 4K</div>
+                    <div>FPS: 60</div>
+                </div>
+            </div>
+
+            <!-- CINEMATIC VIDEO WRAPPER -->
+            <div class="relative p-1 bg-neutral-200 dark:bg-sys-border rounded-sm">
+                <!-- Decorative Technical Corners -->
+                <div class="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-black dark:border-white z-10">
+                </div>
+                <div class="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-black dark:border-white z-10">
+                </div>
+                <div
+                    class="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-black dark:border-white z-10">
+                </div>
+                <div
+                    class="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-black dark:border-white z-10">
+                </div>
+
+                <div class="aspect-video-container bg-black relative rounded-sm overflow-hidden group">
+                    <!-- Scanline Overlay -->
+                    <div class="scanline"></div>
+
+                    <!-- PLACEHOLDER IFRAME - REPLACE SRC WITH YOUR ACTUAL VIDEO -->
+                    <iframe
+                        src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&mute=1&controls=0&modestbranding=1"
+                        title="ALIS Project Demo" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen class="grayscale group-hover:grayscale-0 transition-all duration-700"></iframe>
+
+                    <!-- Video UI Overlay -->
+                    <div
+                        class="absolute top-4 left-4 font-mono text-xs text-sys-signal bg-black/50 px-2 py-1 rounded backdrop-blur-sm pointer-events-none">
+                        LIVE FEED
+                    </div>
+                    <div
+                        class="absolute bottom-4 right-4 font-mono text-xs text-white bg-black/50 px-2 py-1 rounded backdrop-blur-sm pointer-events-none">
+                        00:02:14 / 00:05:00
+                    </div>
+                </div>
+            </div>
+
+            <p class="mt-4 text-center text-xs font-mono text-neutral-500">
+                FIGURE 1.0: Real-time anomaly detection scenario in New Delhi region.
+            </p>
+        </div>
+    </section>
+
+    <!-- SECTION: PROBLEM & SOLUTION GRID -->
+    <section class="py-24 bg-white dark:bg-sys-black border-b border-neutral-200 dark:border-sys-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-16">
+                <!-- PROBLEM -->
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-10 h-10 border border-neutral-200 dark:border-sys-border flex items-center justify-center bg-neutral-50 dark:bg-sys-panel text-sys-error">
+                            <i class="ph-bold ph-warning text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">The Challenge</h3>
+                    </div>
+                    <ul class="space-y-6">
+                        <li class="flex gap-4 group">
+                            <div
+                                class="w-px h-auto bg-neutral-200 dark:bg-sys-border group-hover:bg-sys-error transition-colors">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-black dark:text-white">Fraud Detection</h4>
+                                <p class="text-sm text-neutral-500 mt-1 leading-relaxed">Identifying unusual
+                                    biometric/demographic update patterns manually across 3.7 million records is
+                                    statistically impossible without AI.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4 group">
+                            <div
+                                class="w-px h-auto bg-neutral-200 dark:bg-sys-border group-hover:bg-sys-error transition-colors">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-black dark:text-white">Resource Allocation</h4>
+                                <p class="text-sm text-neutral-500 mt-1 leading-relaxed">Reactive kit deployment leads
+                                    to long queues in high-demand zones while machinery sits idle in others.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- SOLUTION -->
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-10 h-10 border border-neutral-200 dark:border-sys-border flex items-center justify-center bg-neutral-50 dark:bg-sys-panel text-sys-signal">
+                            <i class="ph-bold ph-check-circle text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">The ALIS Solution</h3>
+                    </div>
+                    <ul class="space-y-6">
+                        <li class="flex gap-4 group">
+                            <div
+                                class="w-px h-auto bg-neutral-200 dark:bg-sys-border group-hover:bg-sys-signal transition-colors">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-black dark:text-white">Predictive Intelligence</h4>
+                                <p class="text-sm text-neutral-500 mt-1 leading-relaxed">SARIMA + XGBoost ensemble
+                                    models forecast enrollment center demand 30 days in advance with 87% verifiable
+                                    accuracy.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4 group">
+                            <div
+                                class="w-px h-auto bg-neutral-200 dark:bg-sys-border group-hover:bg-sys-signal transition-colors">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-black dark:text-white">Automated Risk Scoring</h4>
+                                <p class="text-sm text-neutral-500 mt-1 leading-relaxed">Real-time evaluation of every
+                                    pincode using a multi-factor risk engine (Bio, Demo, Mobile linkage gaps).</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: SYSTEM ARCHITECTURE (VISUAL) -->
+    <section id="architecture"
+        class="py-24 bg-neutral-50 dark:bg-sys-dark border-b border-neutral-200 dark:border-sys-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold mb-4">System Architecture</h2>
+                <p class="text-neutral-500 max-w-2xl">
+                    High-availability data pipeline processing raw CSV logs into actionable executive insights.
+                </p>
+            </div>
+
+            <!-- ARCHITECTURE DIAGRAM -->
+            <div class="overflow-x-auto pb-4">
+                <div class="min-w-[900px] flex justify-between items-stretch gap-4">
+
+                    <!-- COLUMN 1: INGEST -->
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="text-xs font-mono font-bold uppercase text-neutral-400 mb-2">DATA SOURCE</div>
+                        <div
+                            class="p-6 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm h-full flex flex-col justify-center text-center">
+                            <i class="ph-bold ph-file-csv text-3xl mb-4 mx-auto text-neutral-400"></i>
+                            <div class="font-bold text-sm">Raw CSV Logs</div>
+                            <div class="text-xs text-neutral-500 mt-1">Biometric, Demo, Enrollment</div>
+                        </div>
+                    </div>
+
+                    <!-- CONNECTOR -->
+                    <div class="flex items-center justify-center">
+                        <i class="ph-bold ph-arrow-right text-neutral-300"></i>
+                    </div>
+
+                    <!-- COLUMN 2: PROCESSING -->
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="text-xs font-mono font-bold uppercase text-neutral-400 mb-2">BACKEND CORE</div>
+                        <div
+                            class="p-6 bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white rounded-sm h-full flex flex-col justify-center text-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-grid-white opacity-10"></div>
+                            <i class="ph-bold ph-cpu text-3xl mb-4 mx-auto"></i>
+                            <div class="font-bold text-sm">FastAPI Engine</div>
+                            <div class="text-xs opacity-70 mt-1">Data Cleaning & Merging</div>
+                        </div>
+                    </div>
+
+                    <!-- CONNECTOR -->
+                    <div class="flex items-center justify-center">
+                        <i class="ph-bold ph-arrow-right text-neutral-300"></i>
+                    </div>
+
+                    <!-- COLUMN 3: ML LAYER -->
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="text-xs font-mono font-bold uppercase text-neutral-400 mb-2">INTELLIGENCE</div>
+                        <div class="flex flex-col gap-2 h-full">
+                            <div
+                                class="flex-1 p-4 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-sys-signal"></div>
+                                <div class="text-xs font-bold">XGBoost (Risk)</div>
+                            </div>
+                            <div
+                                class="flex-1 p-4 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-sys-signal"></div>
+                                <div class="text-xs font-bold">SARIMA (Forecast)</div>
+                            </div>
+                            <div
+                                class="flex-1 p-4 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-sys-signal"></div>
+                                <div class="text-xs font-bold">IsoForest (Anomaly)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONNECTOR -->
+                    <div class="flex items-center justify-center">
+                        <i class="ph-bold ph-arrow-right text-neutral-300"></i>
+                    </div>
+
+                    <!-- COLUMN 4: PRESENTATION -->
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="text-xs font-mono font-bold uppercase text-neutral-400 mb-2">FRONTEND</div>
+                        <div
+                            class="p-6 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm h-full flex flex-col justify-center text-center">
+                            <i class="ph-bold ph-desktop text-3xl mb-4 mx-auto text-neutral-400"></i>
+                            <div class="font-bold text-sm">Streamlit UI</div>
+                            <div class="text-xs text-neutral-500 mt-1">Interactive Dashboards</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: DATA DICTIONARY (DETAILED) -->
+    <section id="data" class="py-24 bg-white dark:bg-sys-black border-b border-neutral-200 dark:border-sys-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold mb-8">Data & Models</h2>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- MODEL 1 -->
+                <div
+                    class="col-span-1 border border-neutral-200 dark:border-sys-border p-6 bg-neutral-50 dark:bg-sys-panel rounded-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold font-mono">RISK SCORING</h3>
+                        <span
+                            class="text-[10px] font-bold bg-black dark:bg-white text-white dark:text-black px-2 py-1 rounded-sm">CUSTOM
+                            ALGO</span>
+                    </div>
+                    <p class="text-xs text-neutral-500 mb-6 leading-relaxed">
+                        A composite index calculated for each pincode to determine operational integrity.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="group">
+                            <div class="flex justify-between text-xs font-mono mb-1">
+                                <span>BIOMETRIC FAILURES</span>
+                                <span class="text-black dark:text-white font-bold">35%</span>
+                            </div>
+                            <div class="w-full h-1 bg-neutral-200 dark:bg-sys-border">
+                                <div class="h-full bg-black dark:bg-white w-[35%]"></div>
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="flex justify-between text-xs font-mono mb-1">
+                                <span>DEMOGRAPHIC UPDATES</span>
+                                <span class="text-black dark:text-white font-bold">25%</span>
+                            </div>
+                            <div class="w-full h-1 bg-neutral-200 dark:bg-sys-border">
+                                <div class="h-full bg-black dark:bg-white w-[25%]"></div>
+                            </div>
+                        </div>
+                        <div class="group">
+                            <div class="flex justify-between text-xs font-mono mb-1">
+                                <span>MOBILE LINKAGE</span>
+                                <span class="text-black dark:text-white font-bold">20%</span>
+                            </div>
+                            <div class="w-full h-1 bg-neutral-200 dark:bg-sys-border">
+                                <div class="h-full bg-black dark:bg-white w-[20%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODEL 2 -->
+                <div
+                    class="col-span-1 border border-neutral-200 dark:border-sys-border p-6 bg-neutral-50 dark:bg-sys-panel rounded-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold font-mono">CLUSTERING</h3>
+                        <span
+                            class="text-[10px] font-bold bg-black dark:bg-white text-white dark:text-black px-2 py-1 rounded-sm">K-MEANS</span>
+                    </div>
+                    <p class="text-xs text-neutral-500 mb-6 leading-relaxed">
+                        Unsupervised segmentation of districts into 7 actionable operational profiles.
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-[10px] font-mono font-bold uppercase">
+                        <div
+                            class="p-2 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-black text-center text-sys-error">
+                            HIGH_RISK</div>
+                        <div
+                            class="p-2 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-black text-center">
+                            URBAN_MIGRATION</div>
+                        <div
+                            class="p-2 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-black text-center">
+                            CHILD_FOCUS</div>
+                        <div
+                            class="p-2 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-black text-center">
+                            STABLE_RURAL</div>
+                        <div
+                            class="p-2 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-black text-center">
+                            GROWING</div>
+                        <div
+                            class="p-2 border border-neutral-200 dark:border-sys-border bg-white dark:bg-sys-black text-center text-sys-signal">
+                            OPTIMIZED</div>
+                    </div>
+                </div>
+
+                <!-- MODEL 3 -->
+                <div
+                    class="col-span-1 border border-neutral-200 dark:border-sys-border p-6 bg-neutral-50 dark:bg-sys-panel rounded-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold font-mono">FORECASTING</h3>
+                        <span
+                            class="text-[10px] font-bold bg-black dark:bg-white text-white dark:text-black px-2 py-1 rounded-sm">ENSEMBLE</span>
+                    </div>
+                    <p class="text-xs text-neutral-500 mb-6 leading-relaxed">
+                        Hybrid prediction model combining statistical trends with gradient boosted trees.
+                    </p>
+                    <div
+                        class="p-4 bg-white dark:bg-sys-black border border-neutral-200 dark:border-sys-border font-mono text-xs">
+                        <div class="flex justify-between mb-2">
+                            <span>MODEL</span>
+                            <span>PARAMS</span>
+                        </div>
+                        <div class="w-full h-px bg-neutral-200 dark:bg-sys-border mb-2"></div>
+                        <div class="flex justify-between mb-1 text-neutral-500">
+                            <span>SARIMA</span>
+                            <span>(1,1,1)(1,1,1)12</span>
+                        </div>
+                        <div class="flex justify-between text-neutral-500">
+                            <span>XGBoost</span>
+                            <span>Lag: 7, 14, 30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: DEVELOPER API (INTERACTIVE) -->
+    <section id="api" class="py-24 bg-neutral-50 dark:bg-sys-dark border-b border-neutral-200 dark:border-sys-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div>
+                    <h2 class="text-3xl font-bold mb-4">Developer API</h2>
+                    <p class="text-neutral-500 mb-8">
+                        Integrate ALIS intelligence directly into state-level dashboards via REST endpoints.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div
+                            class="flex gap-4 p-4 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm">
+                            <div
+                                class="w-8 h-8 flex items-center justify-center bg-sys-signal text-black font-bold rounded-sm">
+                                1</div>
+                            <div>
+                                <h4 class="font-bold text-sm">Authenticate</h4>
+                                <p class="text-xs text-neutral-500 mt-1">Obtain a secure JWT token via the /auth/login
+                                    endpoint.</p>
+                            </div>
+                        </div>
+                        <div
+                            class="flex gap-4 p-4 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm">
+                            <div
+                                class="w-8 h-8 flex items-center justify-center bg-sys-black text-white dark:bg-white dark:text-black font-bold rounded-sm">
+                                2</div>
+                            <div>
+                                <h4 class="font-bold text-sm">Query Metrics</h4>
+                                <p class="text-xs text-neutral-500 mt-1">Fetch risk scores, cluster IDs, and anomaly
+                                    flags for specific pincodes.</p>
+                            </div>
+                        </div>
+                        <div
+                            class="flex gap-4 p-4 bg-white dark:bg-sys-panel border border-neutral-200 dark:border-sys-border rounded-sm">
+                            <div
+                                class="w-8 h-8 flex items-center justify-center bg-sys-black text-white dark:bg-white dark:text-black font-bold rounded-sm">
+                                3</div>
+                            <div>
+                                <h4 class="font-bold text-sm">Visualize</h4>
+                                <p class="text-xs text-neutral-500 mt-1">Use returned JSON data to populate charts or
+                                    trigger automated alerts.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <a href="http://localhost:8000/api/docs"
+                            class="inline-flex items-center gap-2 text-sm font-bold border-b border-black dark:border-white pb-1 hover:text-sys-signal hover:border-sys-signal transition-colors">
+                            VIEW SWAGGER UI <i class="ph-bold ph-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CODE VIEWER SIMULATION -->
+                <div class="bg-sys-black border border-sys-border rounded-sm overflow-hidden shadow-2xl">
+                    <div class="flex items-center px-4 py-2 bg-sys-panel border-b border-sys-border">
+                        <div class="flex gap-2 mr-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                        </div>
+                        <div class="flex text-xs font-mono text-neutral-400 gap-4">
+                            <button class="text-white hover:text-white"
+                                @click="activeTab = 'overview'">request.py</button>
+                            <button class="hover:text-white" @click="activeTab = 'response'">response.json</button>
+                        </div>
+                    </div>
+                    <div class="p-6 font-mono text-xs overflow-x-auto">
+                        <!-- REQUEST TAB -->
+                        <div x-show="activeTab === 'overview'">
+                            <pre class="text-neutral-300">
+<span class="text-purple-400">import</span> requests
+
+url = <span class="text-green-400">"http://localhost:8000/api/v1/pincodes/110001"</span>
+
+payload = {
+    <span class="text-green-400">"include_history"</span>: <span class="text-yellow-400">True</span>,
+    <span class="text-green-400">"model_version"</span>: <span class="text-green-400">"v4.2"</span>
+}
+
+headers = {
+    <span class="text-green-400">"Authorization"</span>: <span class="text-green-400">"Bearer eyJhbGciOiJIUzI1..."</span>,
+    <span class="text-green-400">"Content-Type"</span>: <span class="text-green-400">"application/json"</span>
+}
+
+response = requests.get(url, json=payload, headers=headers)
+
+print(response.json())
+</pre>
+                        </div>
+                        <!-- RESPONSE TAB -->
+                        <div x-show="activeTab === 'response'" style="display: none;">
+                            <pre class="text-neutral-300">
+{
+  <span class="text-green-400">"pincode"</span>: <span class="text-yellow-400">110001</span>,
+  <span class="text-green-400">"state"</span>: <span class="text-green-400">"Delhi"</span>,
+  <span class="text-green-400">"risk_metrics"</span>: {
+    <span class="text-green-400">"overall_score"</span>: <span class="text-yellow-400">82.5</span>,
+    <span class="text-green-400">"category"</span>: <span class="text-red-400">"CRITICAL"</span>,
+    <span class="text-green-400">"biometric_failure_rate"</span>: <span class="text-yellow-400">0.14</span>
+  },
+  <span class="text-green-400">"prediction"</span>: {
+    <span class="text-green-400">"next_30_days_demand"</span>: <span class="text-yellow-400">4500</span>,
+    <span class="text-green-400">"recommended_kits"</span>: <span class="text-yellow-400">12</span>
+  },
+  <span class="text-green-400">"cluster"</span>: <span class="text-green-400">"HIGH_RISK_URBAN"</span>
+}
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER: SYSTEM STATUS -->
+    <footer class="bg-sys-black text-white pt-16 pb-8 border-t border-sys-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                <!-- COL 1 -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="ph-bold ph-shield-check text-2xl text-sys-signal"></i>
+                        <span class="font-bold text-xl tracking-tight">ALIS</span>
+                    </div>
+                    <p class="text-neutral-500 text-sm leading-relaxed max-w-sm">
                         Aadhaar Lifecycle Intelligence System.<br>
-                        Ensuring integrity through data.<br>
-                        Built for UIDAI Hackathon 2026.
+                        Securing national identity infrastructure through unsupervised machine learning.
                     </p>
                 </div>
 
+                <!-- COL 2 -->
                 <div>
-                    <h4 class="font-bold mb-4">Dashboard</h4>
+                    <h4 class="font-bold text-sm uppercase mb-4 tracking-wider">Platform</h4>
                     <ul class="space-y-2 text-sm text-neutral-400">
-                        <li><a href="http://localhost:8501" class="hover:text-white transition-colors">Launch
-                                Analytics</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Risk Reports</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Resource Maps</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-bold mb-4">Developers</h4>
-                    <ul class="space-y-2 text-sm text-neutral-400">
-                        <li><a href="http://localhost:8000/api/docs" class="hover:text-white transition-colors">API
-                                Reference</a></li>
-                        <li><a href="http://localhost:8000/redoc" class="hover:text-white transition-colors">Redoc</a>
+                        <li><a href="http://localhost:8501"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">Dashboard</a>
                         </li>
-                        <li><a href="http://localhost:8000/health" class="hover:text-white transition-colors">System
-                                Status</a></li>
+                        <li><a href="#video"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">Live
+                                Demo</a></li>
+                        <li><a href="#data"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">Models</a>
+                        </li>
+                        <li><a href="#"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">Security</a>
+                        </li>
                     </ul>
                 </div>
 
+                <!-- COL 3 -->
                 <div>
-                    <h4 class="font-bold mb-4">Legal</h4>
+                    <h4 class="font-bold text-sm uppercase mb-4 tracking-wider">Developers</h4>
                     <ul class="space-y-2 text-sm text-neutral-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Terms of Use</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Data Governance</a></li>
+                        <li><a href="http://localhost:8000/api/docs"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">REST
+                                API</a></li>
+                        <li><a href="http://localhost:8000/redoc"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">Redoc
+                                Spec</a></li>
+                        <li><a href="#"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">GitHub
+                                Repo</a></li>
+                        <li><a href="#"
+                                class="hover:text-white hover:underline decoration-sys-signal underline-offset-4">Contributing</a>
+                        </li>
                     </ul>
                 </div>
             </div>
 
+            <!-- SERVER STATUS BAR -->
             <div
-                class="border-t border-neutral-800 mt-16 pt-8 flex justify-between items-center text-xs text-neutral-500">
-                <p>&copy; 2026 ALIS Team. All rights reserved.</p>
-                <p>Government of India</p>
+                class="border-t border-sys-border pt-8 flex flex-col md:flex-row justify-between items-center text-xs font-mono text-neutral-500">
+                <div class="flex items-center gap-6 mb-4 md:mb-0">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1.5 h-1.5 rounded-full bg-sys-signal animate-pulse"></div>
+                        <span>ALL SYSTEMS OPERATIONAL</span>
+                    </div>
+                    <div>LATENCY: 24ms</div>
+                    <div>REGION: AP-SOUTH-1</div>
+                </div>
+                <div class="flex gap-4">
+                    <span>© 2026 ALIS PROJECT</span>
+                    <span>UIDAI HACKATHON</span>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- Init AOS -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 50,
-            easing: 'ease-out-cubic'
-        });
-    </script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 {
-  "training_timestamp": "2026-01-17T14:15:18.799988",
+  "training_timestamp": "2026-01-17T15:15:49.554441",
   "samples": 66,
   "models": {
     "bio": {
@@ -12,7 +12,7 @@
           "seasonal_strength": 0.3385041648004625,
           "differencing_order": 0,
           "n_samples": 66,
-          "fit_timestamp": "2026-01-17T14:15:18.844355",
+          "fit_timestamp": "2026-01-17T15:15:49.679563",
           "aic": 1427.6619323964453,
           "bic": 1437.222047423586,
           "hqic": 1431.3024787253298,
@@ -39,7 +39,7 @@
           "n_features": 19,
           "in_sample_mae": 568.1393295434805,
           "in_sample_rmse": 930.7494500034331,
-          "fit_timestamp": "2026-01-17T14:15:18.995178"
+          "fit_timestamp": "2026-01-17T15:15:50.004839"
         }
       }
     },
@@ -53,7 +53,7 @@
           "seasonal_strength": 0.4676347632022993,
           "differencing_order": 1,
           "n_samples": 66,
-          "fit_timestamp": "2026-01-17T14:15:19.078475",
+          "fit_timestamp": "2026-01-17T15:15:50.121420",
           "aic": 1379.9039844952886,
           "bic": 1389.3630859858417,
           "hqic": 1383.4927544066709,
@@ -80,7 +80,7 @@
           "n_features": 19,
           "in_sample_mae": 761.6363971416766,
           "in_sample_rmse": 1088.928394332316,
-          "fit_timestamp": "2026-01-17T14:15:19.128011"
+          "fit_timestamp": "2026-01-17T15:15:50.182490"
         }
       }
     },
@@ -94,7 +94,7 @@
           "seasonal_strength": 0.0,
           "differencing_order": 1,
           "n_samples": 66,
-          "fit_timestamp": "2026-01-17T14:15:19.168318",
+          "fit_timestamp": "2026-01-17T15:15:50.238626",
           "aic": -1618.6323479422722,
           "bic": -1612.2029437630977,
           "hqic": -1616.1036318526203,
@@ -121,7 +121,7 @@
           "n_features": 19,
           "in_sample_mae": 0.0,
           "in_sample_rmse": 0.0,
-          "fit_timestamp": "2026-01-17T14:15:19.183956"
+          "fit_timestamp": "2026-01-17T15:15:50.265170"
         }
       }
     }
