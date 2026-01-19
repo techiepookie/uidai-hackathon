@@ -152,7 +152,7 @@
         "metadata": {
           "in_sample_mae": 0.0,
           "in_sample_rmse": 0.0,
-          "aic": Infinity,
+          "aic": "Infinity",
           "epochs": 50,
           "look_back": 14
         }
