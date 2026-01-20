@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements and app files
 COPY backend/requirements.txt backend-requirements.txt
+COPY backend/app ./app
 COPY streamlit_app.py .
 COPY Frontend ./Frontend
 
