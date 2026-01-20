@@ -30,7 +30,9 @@ venv/
 ENV/
 env/
 .venv/
-
+# MD FILES 
+ORACLE_CLOUD_DEPLOYMENT.md
+QUICKSTART_ORACLE.md
 # =====================
 # IDE / Editors
 # =====================
