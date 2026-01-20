@@ -33,6 +33,13 @@ env/
 # MD FILES 
 ORACLE_CLOUD_DEPLOYMENT.md
 QUICKSTART_ORACLE.md
+
+# =====================
+# SSH KEYS
+# =====================
+ssh-key-2026-01-20.key
+ssh-key-2026-01-20.key.pub
+
 # =====================
 # IDE / Editors
 # =====================
