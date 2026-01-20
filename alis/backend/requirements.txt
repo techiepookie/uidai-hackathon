@@ -40,5 +40,11 @@ pytest-cov>=4.1.0
 # Logging
 loguru>=0.7.2
 
+# Dashboard & Visualization
+streamlit>=1.30.0
+plotly>=5.18.0
+seaborn>=0.13.0
+matplotlib>=3.8.0
+
 # Data Generation (for sample data)
 faker>=23.2.0
