@@ -13,7 +13,7 @@ services:
       - DATABASE_URL=sqlite:///data/alis.db
       - DEBUG=false
       - ENVIRONMENT=production
-      - CORS_ORIGINS=*
+      - CORS_ORIGINS=["*"]
     volumes:
       - ./backend/data:/app/data
       - ./Frontend:/app/Frontend
