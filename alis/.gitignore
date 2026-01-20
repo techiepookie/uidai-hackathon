@@ -84,7 +84,8 @@ logs/
 .env.local
 .env.*.local
 *.env
-
+backend/.env
+/backend/backend/.env
 # =====================
 # OS Files
 # =====================
